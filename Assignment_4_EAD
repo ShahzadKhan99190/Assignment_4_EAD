@@ -167,3 +167,70 @@ class Program
         return equation;
     }
 }
+
+
+
+///// Q2/////
+-------------
+
+
+using System.Windows.Forms;
+
+namespace CalculatorApp
+{
+    public partial class CalculatorForm : Form
+    {
+        public CalculatorForm()
+        {
+            InitializeComponent();
+        }
+
+        private void NumberButton_Click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            inputTextBox.Text += button.Text;
+        }
+
+        private void OperatorButton_Click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            inputTextBox.Text += " " + button.Text + " ";
+        }
+
+        private void EqualsButton_Click(object sender, EventArgs e)
+        {
+            string equation = inputTextBox.Text;
+            try
+            {
+                double result = EvaluateExpression(equation);
+                historyListBox.Items.Add($"{equation} = {result}");
+                inputTextBox.Text = result.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "Calculation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ClearButton_Click(object sender, EventArgs e)
+        {
+            inputTextBox.Clear();
+        }
+
+        private void CopyButton_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(inputTextBox.Text);
+        }
+
+        private void PasteButton_Click(object sender, EventArgs e)
+        {
+            inputTextBox.Text += Clipboard.GetText();
+        }
+
+        private double EvaluateExpression(string equation)
+        {
+            // Implement your expression evaluation logic here (similar to previous code examples).
+        }
+    }
+}
+
