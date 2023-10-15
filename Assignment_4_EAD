@@ -1,0 +1,169 @@
+using System;
+
+///// Q1/////
+-------------
+
+
+class Program
+{
+    static void Main()
+    {
+        string equation1 = "122 + 323";
+        string eq1 = “1 + 234”;
+        string result1 = Solve(equation1);
+        string res1 = Solve(eq1);
+        Console.WriteLine(result1);
+        Console.WriteLine(res1);
+
+        string equation2 = "323 - 121";
+        string eq2 = “1 - 234”;
+        string result2 = Solve(equation2);
+        string res2 = Solve(eq2);
+        Console.WriteLine(result2);
+        Console.WriteLine(res2);
+
+        string equation3 = "22 x 45";
+        string eq3 = “3 x 9”;
+        string result3 = Solve(equation3);
+        string res3 = Solve(eq3);
+        Console.WriteLine(result3);
+        Console.WriteLine(res3);
+
+        string equation4 = "22 / 2";
+        string eq4 = “3 / 9”;
+        string result4 = Solve(equation4);
+        string res4 = Solve(eq4);
+        Console.WriteLine(result4); 
+        Console.WriteLine(res4);
+
+        string equation5 = "22 / 2 x 34 - 4";
+        string eq5 = “3 x 4 / 9 + 4”
+        string result5 = Solve(equation5);
+        string res5 = Solve(eq5);
+        Console.WriteLine(result5);
+        Console.WriteLine(res5);
+
+        string equation6 = "(1 + 1) - 3 x (44 x 5) / 20";
+        string result6 = Solve(equation6);
+        Console.WriteLine(result6);
+
+        string equation7 = "1 + 2 + 4 + 6 + 8";
+        string eq7 = "(1 + 1) 3 + 4 x 5";
+        string eq8 = “1 + 2 + 3 –”;
+        string result7 = Solve(equation7);
+        string res7 = Solve(eq7);
+        string res8 = Solve(eq8);
+        Console.WriteLine(result7);
+        Console.WriteLine(res7);
+        Console.WriteLine(res8);
+    }
+
+    static string Solve(string equation)
+    {
+        try
+        {
+            equation = equation.Replace(" ", ""); // Remove spaces
+            equation = EvaluateBrackets(equation);
+            if (equation == "Invalid equation")
+                return equation;
+            equation = EvaluateDMAS(equation);
+            if (equation == "Invalid equation")
+                return equation;
+
+            // Format the result without trailing decimal zeros
+            double result = double.Parse(equation);
+            string resultString = result.ToString("0.###############");
+
+            return resultString;
+        }
+        catch (Exception)
+        {
+            return "Invalid equation";
+        }
+    }
+
+    static string EvaluateBrackets(string equation)
+    {
+        Stack<int> openBrackets = new Stack<int>();
+
+        for (int i = 0; i < equation.Length; i++)
+        {
+            if (equation[i] == '(')
+            {
+                openBrackets.Push(i);
+            }
+            else if (equation[i] == ')')
+            {
+                if (!openBrackets.Any())
+                    return "Invalid equation";
+
+                int openIndex = openBrackets.Pop();
+                string subExpression = equation.Substring(openIndex + 1, i - openIndex - 1);
+                string subResult = EvaluateDMAS(subExpression);
+                equation = equation.Substring(0, openIndex) + subResult + equation.Substring(i + 1);
+                i = openIndex + subResult.Length - 1;
+            }
+        }
+
+        if (openBrackets.Any())
+            return "Invalid equation";
+
+        return equation;
+    }
+    static string EvaluateDMAS(string equation)
+    {
+        List<char> operators = new List<char> { '*', '/', '+', '-' };
+
+        foreach (char op in operators)
+        {
+            int i = equation.Length - 1;
+            while (i >= 0)
+            {
+                if (equation[i] == op)
+                {
+                    int leftStart = i - 1;
+                    while (leftStart >= 0 && char.IsDigit(equation[leftStart]) || equation[leftStart] == '.')
+                    {
+                        leftStart--;
+                    }
+
+                    int rightEnd = i + 1;
+                    while (rightEnd < equation.Length && (char.IsDigit(equation[rightEnd]) || equation[rightEnd] == '.'))
+                    {
+                        rightEnd++;
+                    }
+
+                    if (leftStart < 0 || rightEnd >= equation.Length)
+                        return "Invalid equation";
+
+                    double left = double.Parse(equation.Substring(leftStart + 1, i - leftStart));
+                    double right = double.Parse(equation.Substring(i + 1, rightEnd - i - 1));
+
+                    double result = 0;
+
+                    switch (op)
+                    {
+                        case '*':
+                            result = left * right;
+                            break;
+                        case '/':
+                            if (right == 0)
+                                return "Invalid equation";
+                            result = left / right;
+                            break;
+                        case '+':
+                            result = left + right;
+                            break;
+                        case '-':
+                            result = left - right;
+                            break;
+                    }
+
+                    equation = equation.Substring(0, leftStart + 1) + result.ToString() + equation.Substring(rightEnd);
+                }
+                i--;
+            }
+        }
+        return equation;
+    }
+}
