@@ -226,11 +226,6 @@ namespace CalculatorApp
         {
             inputTextBox.Text += Clipboard.GetText();
         }
-
-        private double EvaluateExpression(string equation)
-        {
-            // Implement your expression evaluation logic here (similar to previous code examples).
-        }
     }
 }
 
